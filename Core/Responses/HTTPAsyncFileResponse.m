@@ -101,7 +101,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 {
 	if (!readSourceSuspended)
 	{
-		HTTPLogVerbose(@"%@[%p]: Suspending readSource", THIS_FILE, self);
+		NSLog(@"%@[%p]: Suspending readSource", THIS_FILE, self);
 
 		readSourceSuspended = YES;
 		dispatch_suspend(readSource);
@@ -112,7 +112,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 {
 	if (readSourceSuspended)
 	{
-		HTTPLogVerbose(@"%@[%p]: Resuming readSource", THIS_FILE, self);
+		NSLog(@"%@[%p]: Resuming readSource", THIS_FILE, self);
 
 		readSourceSuspended = NO;
 		dispatch_resume(readSource);
@@ -121,7 +121,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 
 - (void)cancelReadSource
 {
-	HTTPLogVerbose(@"%@[%p]: Canceling readSource", THIS_FILE, self);
+	NSLog(@"%@[%p]: Canceling readSource", THIS_FILE, self);
 
 	dispatch_source_cancel(readSource);
 
@@ -147,7 +147,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 		return NO;
 	}
 
-	HTTPLogVerbose(@"%@[%p]: Open fd[%i] -> %@", THIS_FILE, self, fileFD, filePath);
+	NSLog(@"%@[%p]: Open fd[%i] -> %@", THIS_FILE, self, fileFD, filePath);
 
 	readQueue = dispatch_queue_create("HTTPAsyncFileResponse", NULL);
 	readSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, fileFD, 0, readQueue);
@@ -199,7 +199,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 
 		// Perform the read
 
-		HTTPLogVerbose(@"%@[%p]: Attempting to read %lu bytes from file", THIS_FILE, self, (unsigned long)bytesToRead);
+		NSLog(@"%@[%p]: Attempting to read %lu bytes from file", THIS_FILE, self, (unsigned long)bytesToRead);
 
 		ssize_t result = read(fileFD, readBuffer + readBufferOffset, (size_t)bytesToRead);
 
@@ -220,7 +220,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 		}
 		else // (result > 0)
 		{
-			HTTPLogVerbose(@"%@[%p]: Read %lu bytes from file", THIS_FILE, self, (unsigned long)result);
+			NSLog(@"%@[%p]: Read %lu bytes from file", THIS_FILE, self, (unsigned long)result);
 
 			readOffset += result;
 			readBufferOffset += result;
@@ -319,7 +319,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 	{
 		NSUInteger dataLength = [data length];
 
-		HTTPLogVerbose(@"%@[%p]: Returning data of length %lu", THIS_FILE, self, (unsigned long)dataLength);
+		NSLog(@"%@[%p]: Returning data of length %lu", THIS_FILE, self, (unsigned long)dataLength);
 
 		fileOffset += dataLength;
 
