@@ -38,7 +38,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 {
 	if ((self = [super init]))
 	{
-		HTTPLogTrace();
+		NSLog(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
 
 		connection = parent; // Parents retain children, children do NOT retain parents
 
@@ -72,7 +72,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 
 - (void)abort
 {
-	HTTPLogTrace();
+	NSLog(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
 
 	[connection responseDidAbort:self];
 	aborted = YES;
@@ -137,7 +137,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 
 - (BOOL)openFileAndSetupReadSource
 {
-	HTTPLogTrace();
+	NSLog(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
 
 	fileFD = open([filePath UTF8String], (O_RDONLY | O_NONBLOCK));
 	if (fileFD == NULL_FD)
@@ -155,7 +155,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 
 	dispatch_source_set_event_handler(readSource, ^{
 
-		HTTPLogTrace2(@"%@: eventBlock - fd[%i]", THIS_FILE, fileFD);
+		NSLog(@"%@: eventBlock - fd[%i]", THIS_FILE, fileFD);
 
 		// Determine how much data we should read.
 		//
@@ -242,7 +242,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 		//
 		// Note: You access self if you reference an iVar.
 
-		HTTPLogTrace2(@"%@: cancelBlock - Close fd[%i]", THIS_FILE, theFileFD);
+		NSLog(@"%@: cancelBlock - Close fd[%i]", THIS_FILE, theFileFD);
 
 		#if !OS_OBJECT_USE_OBJC
 		dispatch_release(theReadSource);
@@ -276,21 +276,21 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 
 - (UInt64)contentLength
 {
-	HTTPLogTrace2(@"%@[%p]: contentLength - %llu", THIS_FILE, self, fileLength);
+	NSLog(@"%@[%p]: contentLength - %llu", THIS_FILE, self, fileLength);
 
 	return fileLength;
 }
 
 - (UInt64)offset
 {
-	HTTPLogTrace();
+	NSLog(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
 
 	return fileOffset;
 }
 
 - (void)setOffset:(UInt64)offset
 {
-	HTTPLogTrace2(@"%@[%p]: setOffset:%llu", THIS_FILE, self, offset);
+	NSLog(@"%@[%p]: setOffset:%llu", THIS_FILE, self, offset);
 
 	if (![self openFileIfNeeded])
 	{
@@ -313,7 +313,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 
 - (NSData *)readDataOfLength:(NSUInteger)length
 {
-	HTTPLogTrace2(@"%@[%p]: readDataOfLength:%lu", THIS_FILE, self, (unsigned long)length);
+	NSLog(@"%@[%p]: readDataOfLength:%lu", THIS_FILE, self, (unsigned long)length);
 
 	if (data)
 	{
@@ -353,7 +353,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 {
 	BOOL result = (fileOffset == fileLength);
 
-	HTTPLogTrace2(@"%@[%p]: isDone - %@", THIS_FILE, self, (result ? @"YES" : @"NO"));
+	NSLog(@"%@[%p]: isDone - %@", THIS_FILE, self, (result ? @"YES" : @"NO"));
 
 	return result;
 }
@@ -365,14 +365,14 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 
 - (BOOL)isAsynchronous
 {
-	HTTPLogTrace();
+	NSLog(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
 
 	return YES;
 }
 
 - (void)connectionDidClose
 {
-	HTTPLogTrace();
+	NSLog(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
 
 	if (fileFD != NULL_FD)
 	{
@@ -392,7 +392,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 
 - (void)dealloc
 {
-	HTTPLogTrace();
+	NSLog(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
 
 	#if !OS_OBJECT_USE_OBJC
 	if (readQueue) dispatch_release(readQueue);
