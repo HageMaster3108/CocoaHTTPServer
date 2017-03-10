@@ -38,7 +38,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 {
 	if ((self = [super init]))
 	{
-		NSLog(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
+		DDLogInfo(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
 
 		connection = parent; // Parents retain children, children do NOT retain parents
 
@@ -72,7 +72,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 
 - (void)abort
 {
-	NSLog(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
+	DDLogInfo(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
 
 	[connection responseDidAbort:self];
 	aborted = YES;
@@ -101,7 +101,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 {
 	if (!readSourceSuspended)
 	{
-		NSLog(@"%@[%p]: Suspending readSource", THIS_FILE, self);
+		DDLogInfo(@"%@[%p]: Suspending readSource", THIS_FILE, self);
 
 		readSourceSuspended = YES;
 		dispatch_suspend(readSource);
@@ -112,7 +112,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 {
 	if (readSourceSuspended)
 	{
-		NSLog(@"%@[%p]: Resuming readSource", THIS_FILE, self);
+		DDLogInfo(@"%@[%p]: Resuming readSource", THIS_FILE, self);
 
 		readSourceSuspended = NO;
 		dispatch_resume(readSource);
@@ -121,7 +121,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 
 - (void)cancelReadSource
 {
-	NSLog(@"%@[%p]: Canceling readSource", THIS_FILE, self);
+	DDLogInfo(@"%@[%p]: Canceling readSource", THIS_FILE, self);
 
 	dispatch_source_cancel(readSource);
 
@@ -137,7 +137,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 
 - (BOOL)openFileAndSetupReadSource
 {
-	NSLog(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
+	DDLogInfo(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
 
 	fileFD = open([filePath UTF8String], (O_RDONLY | O_NONBLOCK));
 	if (fileFD == NULL_FD)
@@ -147,7 +147,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 		return NO;
 	}
 
-	NSLog(@"%@[%p]: Open fd[%i] -> %@", THIS_FILE, self, fileFD, filePath);
+	DDLogInfo(@"%@[%p]: Open fd[%i] -> %@", THIS_FILE, self, fileFD, filePath);
 
 	readQueue = dispatch_queue_create("HTTPAsyncFileResponse", NULL);
 	readSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, fileFD, 0, readQueue);
@@ -155,7 +155,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 
 	dispatch_source_set_event_handler(readSource, ^{
 
-		NSLog(@"%@: eventBlock - fd[%i]", THIS_FILE, fileFD);
+		DDLogInfo(@"%@: eventBlock - fd[%i]", THIS_FILE, fileFD);
 
 		// Determine how much data we should read.
 		//
@@ -199,7 +199,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 
 		// Perform the read
 
-		NSLog(@"%@[%p]: Attempting to read %lu bytes from file", THIS_FILE, self, (unsigned long)bytesToRead);
+		DDLogInfo(@"%@[%p]: Attempting to read %lu bytes from file", THIS_FILE, self, (unsigned long)bytesToRead);
 
 		ssize_t result = read(fileFD, readBuffer + readBufferOffset, (size_t)bytesToRead);
 
@@ -220,7 +220,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 		}
 		else // (result > 0)
 		{
-			NSLog(@"%@[%p]: Read %lu bytes from file", THIS_FILE, self, (unsigned long)result);
+			DDLogInfo(@"%@[%p]: Read %lu bytes from file", THIS_FILE, self, (unsigned long)result);
 
 			readOffset += result;
 			readBufferOffset += result;
@@ -242,7 +242,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 		//
 		// Note: You access self if you reference an iVar.
 
-		NSLog(@"%@: cancelBlock - Close fd[%i]", THIS_FILE, theFileFD);
+		DDLogInfo(@"%@: cancelBlock - Close fd[%i]", THIS_FILE, theFileFD);
 
 		#if !OS_OBJECT_USE_OBJC
 		dispatch_release(theReadSource);
@@ -276,21 +276,21 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 
 - (UInt64)contentLength
 {
-	NSLog(@"%@[%p]: contentLength - %llu", THIS_FILE, self, fileLength);
+	DDLogInfo(@"%@[%p]: contentLength - %llu", THIS_FILE, self, fileLength);
 
 	return fileLength;
 }
 
 - (UInt64)offset
 {
-	NSLog(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
+	DDLogInfo(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
 
 	return fileOffset;
 }
 
 - (void)setOffset:(UInt64)offset
 {
-	NSLog(@"%@[%p]: setOffset:%llu", THIS_FILE, self, offset);
+	DDLogInfo(@"%@[%p]: setOffset:%llu", THIS_FILE, self, offset);
 
 	if (![self openFileIfNeeded])
 	{
@@ -313,13 +313,13 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 
 - (NSData *)readDataOfLength:(NSUInteger)length
 {
-	NSLog(@"%@[%p]: readDataOfLength:%lu", THIS_FILE, self, (unsigned long)length);
+	DDLogInfo(@"%@[%p]: readDataOfLength:%lu", THIS_FILE, self, (unsigned long)length);
 
 	if (data)
 	{
 		NSUInteger dataLength = [data length];
 
-		NSLog(@"%@[%p]: Returning data of length %lu", THIS_FILE, self, (unsigned long)dataLength);
+		DDLogInfo(@"%@[%p]: Returning data of length %lu", THIS_FILE, self, (unsigned long)dataLength);
 
 		fileOffset += dataLength;
 
@@ -353,7 +353,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 {
 	BOOL result = (fileOffset == fileLength);
 
-	NSLog(@"%@[%p]: isDone - %@", THIS_FILE, self, (result ? @"YES" : @"NO"));
+	DDLogInfo(@"%@[%p]: isDone - %@", THIS_FILE, self, (result ? @"YES" : @"NO"));
 
 	return result;
 }
@@ -365,14 +365,14 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 
 - (BOOL)isAsynchronous
 {
-	NSLog(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
+	DDLogInfo(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
 
 	return YES;
 }
 
 - (void)connectionDidClose
 {
-	NSLog(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
+	DDLogInfo(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
 
 	if (fileFD != NULL_FD)
 	{
@@ -392,7 +392,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 
 - (void)dealloc
 {
-	NSLog(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
+	DDLogInfo(@"HTTP Async Trace: %@",NSStringFromSelector(_cmd));
 
 	#if !OS_OBJECT_USE_OBJC
 	if (readQueue) dispatch_release(readQueue);
