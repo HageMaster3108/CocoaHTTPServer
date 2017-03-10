@@ -1,6 +1,7 @@
 #import "HTTPAsyncFileResponse.h"
 #import "HTTPConnection.h"
 #import "HTTPLogging.h"
+#import <CocoaLumberjack/DDLog.h>
 
 #import <unistd.h>
 #import <fcntl.h>
